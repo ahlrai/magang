@@ -3,17 +3,14 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ConversationResource\Pages;
-use App\Filament\Resources\ConversationResource\RelationManagers;
 use App\Models\Conversation;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 
 class ConversationResource extends Resource
 {
@@ -23,21 +20,30 @@ class ConversationResource extends Resource
 
     protected static ?string $navigationGroup = 'Fitur';
 
+    protected static ?string $navigationLabel = 'Conversation Management';
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-            Select::make('contact_id')
-                ->relationship('contact', 'name')
-                ->searchable()
-                ->required(),
-            Textarea::make('message')->required(),
-            Select::make('direction')
-                ->options([
-                    'incoming' => 'Incoming',
-                    'outgoing' => 'Outgoing',
-                ])
-                ->required(),
+                Select::make('social_account_id')
+                    ->relationship('socialAccount', 'account_name')
+                    ->label('Account')
+                    ->searchable()
+                    ->required(),
+                Textarea::make('message')
+                    ->label('Message')
+                    ->required()
+                    ->rows(4),
+                Select::make('direction')
+                    ->options([
+                        'incoming' => 'Incoming',
+                        'outgoing' => 'Outgoing',
+                    ])
+                    ->required()
+                    ->label('Direction'),
+                Forms\Components\DateTimePicker::make('sent_at')
+                    ->label('Sent At'),
             ]);
     }
 
@@ -45,15 +51,28 @@ class ConversationResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('contact.name')->label('Contact'),
-                Tables\Columns\TextColumn::make('message')->limit(50),
-                Tables\Columns\TextColumn::make('direction')->badge(),
-                Tables\Columns\TextColumn::make('created_at')->dateTime('d-M-Y H:i'),
-            ])
-            ->filters([
-                //
+                Tables\Columns\TextColumn::make('socialAccount.account_name')
+                    ->label('Account')
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('message')
+                    ->label('Message')
+                    ->limit(50)
+                    ->wrap(),
+                Tables\Columns\BadgeColumn::make('direction')
+                    ->colors([
+                        'success' => 'incoming',
+                        'info' => 'outgoing',
+                    ]),
+                Tables\Columns\TextColumn::make('sent_at')
+                    ->dateTime('d M Y H:i')
+                    ->label('Sent At'),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime('d M Y H:i')
+                    ->label('Created'),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
@@ -66,9 +85,7 @@ class ConversationResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array

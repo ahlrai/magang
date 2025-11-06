@@ -32,15 +32,34 @@ class PostResource extends Resource
                         'instagram' => 'Instagram',
                         'facebook' => 'Facebook',
                     ])
-                    ->required(),
+                    ->required()
+                    ->reactive(),
 
-                Forms\Components\TextInput::make('caption')
-                    ->required(),
+                //Facebook
+                Forms\Components\TextInput::make('page_id')
+                    ->label('Facebook Page ID')
+                    ->visible(fn (callable $get) => $get('platform') === 'facebook'),
 
-                Forms\Components\TextInput::make('media_url'),
+                Forms\Components\FileUpload::make('media_url')
+                    ->label('Instagram Media')
+                    ->image()
+                    ->directory('posts/media')
+                    ->visible(fn (callable $get) => $get('platform') === 'instagram'),
+
+                Forms\Components\Textarea::make('caption')
+                    ->required()
+                    ->visible(fn (callable $get) => in_array($get('platform'), ['facebook', 'instagram'])),
 
                 Forms\Components\DateTimePicker::make('scheduled_at')
                     ->required(),
+
+                Forms\Components\Select::make('status')
+                    ->options([
+                        'scheduled' => 'Scheduled',
+                        'posted' => 'Posted',
+                        'failed' => 'Failed',
+                    ])
+                    ->default('scheduled'),
                             ]);
     }
 
@@ -71,9 +90,13 @@ class PostResource extends Resource
                     ->dateTime('d-M-Y H:i')
                     ->sortable(),
 
-                TextColumn::make('response.status')
+                TextColumn::make('response_status')
                     ->label('API Response')
                     ->badge()
+                    ->colors([
+                        'success' => fn ($state) => $state === 'success',
+                        'danger'  => fn ($state) => $state === 'error' || $state === 'failed',
+                    ])
                     ->default('—'),
             ])
             ->filters([
@@ -81,6 +104,7 @@ class PostResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

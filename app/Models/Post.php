@@ -10,21 +10,25 @@ class Post extends Model
     use HasFactory;
 
     protected $fillable = [
-    'platform',
-    'caption',
-    'media_url',
-    'status',
-    'scheduled_at',
-    'posted_at',
-    'response',
-    'user_id',
-];
+        'social_account_id',
+        'platform',
+        'caption',
+        'media_url',
+        'status',
+        'scheduled_at',
+        'posted_at',
+        'response',
+        'page_id',
+    ];
 
-// Cast response JSON agar mudah dipakai
-protected $casts = [
-    'scheduled_at' => 'datetime',
-    'posted_at' => 'datetime',
-    'response' => 'array',
-];
+    protected $casts = [
+        'response' => 'array',
+        'scheduled_at' => 'datetime',
+        'posted_at' => 'datetime',
+    ];
 
+    public function socialAccount()
+    {
+        return $this->belongsTo(SocialAccount::class);
+    }
 }

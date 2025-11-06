@@ -2,32 +2,45 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\User;
+use App\Models\SocialMedia;
+use App\Models\SocialAccount;
+use App\Models\Contact;
+use App\Models\Conversation;
+use App\Models\Post;
 use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
+        // Buat user + role
+        $admin = \App\Models\User::firstOrCreate(
+    ['email' => 'admin@example.com'],
+    [
+        'name' => 'Admin',
+        'password' => bcrypt('password'),
+        'email_verified_at' => now(),
+    ]
+);
 
-        $user1 = User::factory()->create([
-            'name' => 'Admin',
-            'email' => 'admin@example.com',
-        ]);
+        $role = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Admin']);
+        $admin->assignRole($role);
 
-        User::factory()->create([
-            'name' => 'Staff',
-            'email' => 'staff@example.com',
-        ]);
+        // Buat Social Media
+        SocialMedia::factory(4)->create();
 
-        $role = Role::create(['name' => 'Admin']);
-        $user1->assignRole($role);
+        // Buat Social Accounts
+        SocialAccount::factory(5)->create();
 
+        // Buat Contacts
+        Contact::factory(3)->create();
+
+        // Buat Conversations
+        Conversation::factory(10)->create();
+
+        // Buat Posts
+        Post::factory(13)->create();
     }
 }

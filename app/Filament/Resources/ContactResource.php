@@ -3,49 +3,65 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ContactResource\Pages;
-use App\Filament\Resources\ContactResource\RelationManagers;
 use App\Models\Contact;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ContactResource extends Resource
 {
     protected static ?string $model = Contact::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
+    protected static ?string $navigationGroup = 'Management Sosial Media';
+    protected static ?string $navigationLabel = 'Contacts';
+    protected static ?string $pluralLabel = 'Contacts';
+    protected static ?string $modelLabel = 'Contact';
 
-    protected static ?string $navigationGroup = 'Fitur';
-    
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-            TextInput::make('name')->required(),
-            TextInput::make('username')->required()->unique(ignoreRecord: true),
-            Select::make('platform')
-                ->options([
-                    'instagram' => 'Instagram',
-                    'tiktok' => 'TikTok',
-                    'facebook' => 'Facebook',
-                    'youtube' => 'YouTube',
-                ])
-                ->required(),
-            Select::make('status')
-                ->options([
-                    'baru' => 'Baru',
-                    'follow-up' => 'Follow Up',
-                    'closing' => 'Closing',
-                    'lost' => 'Lost',
-                ])
-                ->default('baru')
-                ->required(),
+                Forms\Components\Section::make('Contact Information')
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->label('Nama')
+                            ->required(),
+
+                        Forms\Components\TextInput::make('username')
+                            ->required()
+                            ->unique(ignoreRecord: true),
+
+                        Forms\Components\TextInput::make('email')
+                            ->email()
+                            ->nullable(),
+
+                        Forms\Components\TextInput::make('phone')
+                            ->tel()
+                            ->nullable(),
+
+                        Forms\Components\Select::make('platform')
+                            ->options([
+                                'instagram' => 'Instagram',
+                                'tiktok' => 'TikTok',
+                                'facebook' => 'Facebook',
+                                'youtube' => 'YouTube',
+                            ])
+                            ->required(),
+
+                        Forms\Components\Select::make('status')
+                            ->options([
+                                'baru' => 'Baru',
+                                'follow-up' => 'Follow Up',
+                                'closing' => 'Closing',
+                                'lost' => 'Lost',
+                            ])
+                            ->default('baru')
+                            ->required(),
+                    ])
+                    ->columns(2),
             ]);
     }
 
@@ -53,31 +69,34 @@ class ContactResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')->searchable(),
-                Tables\Columns\TextColumn::make('username'),
-                Tables\Columns\TextColumn::make('platform')->badge(),
-                Tables\Columns\TextColumn::make('status')->badge(),
-                Tables\Columns\TextColumn::make('created_at')->dateTime('d-M-Y'),
+                Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('username')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('email')->searchable(),
+                Tables\Columns\TextColumn::make('phone'),
+                Tables\Columns\BadgeColumn::make('platform')
+                    ->colors([
+                        'info' => 'instagram',
+                        'success' => 'tiktok',
+                        'warning' => 'facebook',
+                        'danger' => 'youtube',
+                    ]),
+                Tables\Columns\BadgeColumn::make('status')
+                    ->colors([
+                        'gray' => 'baru',
+                        'warning' => 'follow-up',
+                        'success' => 'closing',
+                        'danger' => 'lost',
+                    ]),
+                Tables\Columns\TextColumn::make('created_at')->dateTime('d M Y H:i')->label('Dibuat'),
             ])
-            ->filters([
-                //
-            ])
+            ->filters([])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Actions\DeleteBulkAction::make(),
             ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
     }
 
     public static function getPages(): array

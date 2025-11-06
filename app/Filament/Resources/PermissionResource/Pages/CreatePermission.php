@@ -17,6 +17,6 @@ class CreatePermission extends CreateRecord
 
     protected function getCreatedNotificationTitle(): ?string
     {
-        return 'Role created';
+        return 'Permission created';
     }
 }

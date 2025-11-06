@@ -4,18 +4,22 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Contact;
 
 class Conversation extends Model
 {
     use HasFactory;
 
-    protected $table = 'conversation';
+    protected $fillable = [
+        'social_account_id',
+        'conversation_id',
+        'sender_name',
+        'message',
+        'direction',
+        'sent_at',
+    ];
 
-    protected $fillable = ['contact_id', 'message', 'direction'];
-
-    public function contact()
+    public function socialAccount()
     {
-        return $this->belongsTo(Contact::class, 'contact_id');
+        return $this->belongsTo(SocialAccount::class);
     }
 }

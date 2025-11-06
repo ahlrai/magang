@@ -11,13 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('post_user_managements', function (Blueprint $table) {
             $table->id();
-            $table->string('platform'); // instagram, facebook, dll
-            $table->string('caption');
-            $table->string('media_url')->nullable();
-            $table->enum('status', ['scheduled', 'posted'])->default('scheduled');
-            $table->timestamp('scheduled_at')->nullable();
             $table->timestamps();
         });
     }
@@ -27,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('posts');
+        Schema::dropIfExists('post_user_managements');
     }
 };

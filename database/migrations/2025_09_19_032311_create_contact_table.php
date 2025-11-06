@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('username')->unique();
+            $table->string('email')->nullable();
+            $table->string('phone')->nullable();
             $table->enum('platform', ['instagram', 'tiktok', 'facebook', 'youtube']);
             $table->enum('status', ['baru', 'follow-up', 'closing', 'lost'])->default('baru');
             $table->timestamps();
